@@ -40,7 +40,7 @@ plot_ci <- function(data, capture.colors = c("red","black"),
   pout <- ggplot(data = data,
                  mapping = aes_string(x = statcol, y = "sample.number",
                                       xmin = "LL",xmax = "UL", color = lcolor)) +
-    geom_errorbarh(alpha = .8, ...) +
+    geom_errorbarh(...) +
     scale_colour_manual(values = capture.colors) +
     geom_vline(xintercept = popvalue, linewidth = pop.line.width, color = pop.line.color) +
     labs(y = "Sample Number") +

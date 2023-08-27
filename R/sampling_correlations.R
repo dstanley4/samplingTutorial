@@ -9,7 +9,7 @@
 #' @examples
 #' get_r_samples(pop.r = .35,n=100)
 #' @export
-get_r_samples <- function(pop.r = NA, n, number.of.samples = 10, number.of.decimals = 3, seed.value = NULL) {
+get_r_samples <- function(pop.r = NA, n, number.of.samples = 100, number.of.decimals = 3, seed.value = NULL) {
 
   if (!is.null(seed.value)) {
     set.seed(seed.value)
@@ -54,7 +54,7 @@ get_r_samples <- function(pop.r = NA, n, number.of.samples = 10, number.of.decim
   }
   xx<-1:number.of.samples
   sample.number <- xx
-  data.out <- data.frame(sample.number, pop.r = pop.r, n = n, r =  rs, ci.LL = LLs, ci.UL = ULs, ci.captures.pop.r = in_interval, p = ps)
+  data.out <- data.frame(sample.number, pop.r = pop.r, n = n, r =  rs, LL = LLs, UL = ULs, ci.captured.pop.r = in_interval, p = ps)
   rownames(data.out) <- NULL
 
 

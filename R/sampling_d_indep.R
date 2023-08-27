@@ -10,7 +10,7 @@
 #' @examples
 #' get_d_samples(pop.d = .35, cell.n = 100)
 #' @export
-get_d_samples <- function(pop.d = NA, cell.n = NA, number.of.samples = 10, number.of.decimals = 3, var.equal = TRUE, alternative = "two.sided", seed.value = NULL) {
+get_d_samples <- function(pop.d = NA, cell.n = NA, number.of.samples = 100, number.of.decimals = 3, var.equal = TRUE, alternative = "two.sided", seed.value = NULL) {
 
   if (!is.null(seed.value)) {
     set.seed(seed.value)

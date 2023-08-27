@@ -7,7 +7,7 @@
 get_r_samples(
   pop.r = NA,
   n,
-  number.of.samples = 10,
+  number.of.samples = 100,
   number.of.decimals = 3,
   seed.value = NULL
 )

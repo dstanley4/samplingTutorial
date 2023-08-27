@@ -7,7 +7,7 @@
 get_d_samples(
   pop.d = NA,
   cell.n = NA,
-  number.of.samples = 10,
+  number.of.samples = 100,
   number.of.decimals = 3,
   var.equal = TRUE,
   alternative = "two.sided",
