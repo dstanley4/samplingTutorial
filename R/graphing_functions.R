@@ -1,8 +1,78 @@
 #' Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
 #' @param data simulation data
+#' @param type.1.error.prob your choice of alpha. default is .05
+#' @param sig.line.color color of vertical line for significance
+#' @param sig.line.width thickness of vertical line for significance
+#' @return Data frame with sample d-values
+#' @export
+plot_pvalues <- function(data, type.1.error.prob = .05,
+                         sig.line.color = "green",sig.line.width =1, ...) {
+
+  dfnames = names(data)
+  is_d <- "d" %in% dfnames
+  is_r <- "r" %in% dfnames
+  is_mean <- "m" %in% dfnames
+
+  statcol = "x"
+
+  lcolor = "black"
+  num_row = dim(data)[1]
+
+  height = num_row
+
+
+
+
+  pout <- ggplot(data = data,
+                 mapping = aes(x = p)) +
+    geom_histogram(..., breaks = seq(0, 1, by = .05)) +
+    scale_x_continuous(breaks = seq(0,1, by = .05)) +
+    labs(y = "Frequency") +
+    geom_vline(xintercept = type.1.error.prob, linewidth = sig.line.width, color = sig.line.color) +
+    coord_cartesian(ylim = c(0,height)) +
+    theme_classic()
+
+  return(pout)
+}
+
+
+#' Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
+#' @param data simulation data
+#' @param type.1.error.prob your choice of alpha. default is .05
+#' @param sig.line.color color of vertical line for significance
+#' @param sig.line.width thickness of vertical line for significance
+#' @return Data frame with sample d-values
+#' @export
+plot_compare_pvalues <- function(null_dist, eff_dist, type.1.error.prob = .05,
+                         sig.line.color = "green",sig.line.width =1, ...) {
+
+  num_row = dim(null_dist)[1]
+  height = num_row * type.1.error.prob * 5
+
+
+  inc_value = .01
+
+  pout <- ggplot(data = null_dist,
+                 mapping = aes(x = p)) +
+    geom_histogram(breaks = seq(0, 1, by = inc_value), fill = "red", alpha = .5, ...) +
+    geom_histogram(data = eff_dist, breaks = seq(0, 1, by = inc_value), fill = "blue", alpha = .5, ...) +
+    scale_x_continuous(breaks = seq(0,.20, by = .01)) +
+    labs(y = "Frequency") +
+    geom_vline(xintercept = type.1.error.prob, linewidth = sig.line.width, color = sig.line.color) +
+    coord_cartesian(ylim = c(0,height), xlim = c(0, .20)) +
+    theme_classic()
+
+  return(pout)
+}
+
+
+
+
+#' Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
+#' @param data simulation data
 #' @param capture.colors colors to shade intervals that capture or do not capture parameter
 #' @param pop.line.color color of vertical line for parameter
-#' @param pop.line.with thickness of vertical line for parameter
+#' @param pop.line.width thickness of vertical line for parameter
 #' @return Data frame with sample d-values
 #' @export
 plot_ci <- function(data, capture.colors = c("red","black"),
