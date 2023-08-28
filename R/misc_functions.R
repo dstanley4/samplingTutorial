@@ -39,6 +39,30 @@ percent_true <- function(x) {
   return(sum_TRUE/sum_length*100)
 }
 
+
+#' Probabilty of a p-value in a specified range
+#' @param data simulation data
+#' @param min lower end of range (equal to or greater than)
+#' @param data upper end of range (less than)
+#' @return The probability
+#'@export
+p_range_count <- function(data,min,max) {
+  num_rows <- dim(data)[1]
+  id_greater <- data$p>= min
+  id_less <- data$p<max
+  id_both <- id_greater & id_less
+  sum_both <- sum(id_both)
+  prob_value = round(sum_both/num_rows,3)
+  output = sprintf("%g of %g sampes = %1.3f probabilty", sum_both, num_rows, prob_value)
+  return(output)
+}
+
+
+
+
+
+
+
 fast_mvrnorm <- function(Sigma, mu, n, K) {
   # This is the MASS::mvrnorm routine structured to eliminate
   # redundant calculations when repeated K times
