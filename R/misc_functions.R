@@ -45,7 +45,7 @@ percent_true <- function(x) {
 #' @param min lower end of range (equal to or greater than)
 #' @param data upper end of range (less than)
 #' @return The probability
-#'@export
+#' @export
 p_range_count <- function(data,min,max) {
   num_rows <- dim(data)[1]
   id_greater <- data$p>= min
