@@ -23,7 +23,7 @@ plot_compare_pvalues(
 \item{data}{simulation data}
 }
 \value{
-Data frame with sample d-values
+ggplot object
 }
 \description{
 Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.

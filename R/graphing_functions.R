@@ -1,14 +1,11 @@
 #' Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
-#' @param data simulation data
-#' @param type.1.error.prob your choice of alpha. default is .05
-#' @param sig.line.color color of vertical line for significance
-#' @param sig.line.width thickness of vertical line for significance
-#' @return Data frame with sample d-values
+#' @param .data simulation data
+#' @param type Use "text" for histogram with letters or "bar" for standard histogram
+#' @return ggplot object
 #' @export
-plot_pvalues <- function(data, type.1.error.prob = .05,
-                         sig.line.color = "green",sig.line.width =1, ...) {
+plot_distribution <- function(.data, type = "text", ...) {
 
-  dfnames = names(data)
+  dfnames = names(.data)
   is_d <- "d" %in% dfnames
   is_r <- "r" %in% dfnames
   is_mean <- "m" %in% dfnames
@@ -16,16 +13,61 @@ plot_pvalues <- function(data, type.1.error.prob = .05,
   statcol = "x"
 
   lcolor = "black"
+  num_row = dim(.data)[1]
+
+  if (is_d == TRUE) {
+    xvar = "d"
+    popvalue = .data$pop.d
+  }
+
+  if (is_r == TRUE) {
+    xvar = "r"
+    popvalue = .data$pop.r
+
+  }
+
+
+  pout <- ggplot(data = .data,
+                 mapping = aes_string(x = xvar))
+
+  if (type == "text") {
+    pout <- pout + stat_histotext(label = xvar, ...)
+  } else {
+      pout <- poout + geom_histogram(...)
+  }
+
+  if (xvar =="r") {
+    pout <- pout + coord_cartesian(xlim = c(-1, 1))
+  }
+
+
+  pout <- pout + theme_classic()
+
+  return(pout)
+}
+
+
+
+
+
+#' Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
+#' @param data simulation data
+#' @param type.1.error.prob your choice of alpha. default is .05
+#' @param sig.line.color color of vertical line for significance
+#' @param sig.line.width thickness of vertical line for significance
+#' @return ggplot object
+#' @export
+plot_pvalues <- function(data, type.1.error.prob = .05,
+                         sig.line.color = "green",sig.line.width =1, ...) {
+
+
   num_row = dim(data)[1]
-
-  height = num_row
-
-
+  height = num_row/2
 
 
   pout <- ggplot(data = data,
                  mapping = aes(x = p)) +
-    geom_histogram(..., breaks = seq(0, 1, by = .05)) +
+    geom_histogram(..., breaks = seq(0, 1, by = .01)) +
     scale_x_continuous(breaks = seq(0,1, by = .05)) +
     labs(y = "Frequency") +
     geom_vline(xintercept = type.1.error.prob, linewidth = sig.line.width, color = sig.line.color) +
@@ -41,13 +83,13 @@ plot_pvalues <- function(data, type.1.error.prob = .05,
 #' @param type.1.error.prob your choice of alpha. default is .05
 #' @param sig.line.color color of vertical line for significance
 #' @param sig.line.width thickness of vertical line for significance
-#' @return Data frame with sample d-values
+#' @return ggplot object
 #' @export
 plot_compare_pvalues <- function(null_dist, eff_dist, type.1.error.prob = .05,
                          sig.line.color = "green",sig.line.width =1, ...) {
 
   num_row = dim(null_dist)[1]
-  height = num_row * type.1.error.prob * 5
+  height = num_row /2
 
 
   inc_value = .01
@@ -73,7 +115,7 @@ plot_compare_pvalues <- function(null_dist, eff_dist, type.1.error.prob = .05,
 #' @param capture.colors colors to shade intervals that capture or do not capture parameter
 #' @param pop.line.color color of vertical line for parameter
 #' @param pop.line.width thickness of vertical line for parameter
-#' @return Data frame with sample d-values
+#' @return ggplot object
 #' @export
 plot_ci <- function(data, capture.colors = c("red","black"),
                     pop.line.color = "blue", pop.line.width = 1.5, ...) {
@@ -346,6 +388,8 @@ create_points <- function(df) {
   }
 
   dfout$y2 <- dfout$y/sum(dfout$y) * df$maxdensity[1]
+  dfout <- dplyr::filter(dfout, y2>0)
+
   dfout
 }
 

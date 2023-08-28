@@ -1,6 +1,8 @@
 #' Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
 #' @param pop.d Population d-value
 #' @param cell.n Cell size for both cells for all samples. If you use two values (e.g., c(20, 40), these represent -3/+3 SD for variable sample sizes
+#' @param mean.n Use to specify mean of a distribution of sample sizes. Ignores cell.n if used.
+#' @param sd.n Use to specify sd of a distribution of sample sizes. Ignores cell.n if used.
 #' @param number.of.samples Number of samples to obtain
 #' @param number.of.decimals Number of decimals to report in returned data frame
 #' @param alternative indicates type of alternative hypothesis (e.g., "two.sided") for t.test
@@ -9,27 +11,22 @@
 #' @examples
 #' get_d_rep_samples(pop.d = .35, cell.n = 100)
 #' @export
-get_d_rep_samples <- function(pop.d = NA, cell.n = NA, number.of.samples = 100,
+get_d_rep_samples <- function(pop.d = NULL, n = NULL, mean.n = NULL, sd.n = NULL, number.of.samples = 100,
                               number.of.decimals = 3, alternative = "two.sided", seed.value = NULL) {
 
   if (!is.null(seed.value)) {
     set.seed(seed.value)
   }
 
+  cell.n = n
+
   if (is.na(pop.d)) {return()}
 
-
-  if (length(cell.n) == 1) {
-    ns.for.cell1 = rep(cell.n, number.of.samples)
+  if (!is.null(mean.n) & !is.null(sd.n)) {
+    ns.for.cell1 <- abs(round(rnorm(mean = mean.n, sd = sd.n, n = number.of.samples)))
+    ns.for.cell1[ns.for.cell1 < 4] <- mean.n # if too small use mean.n
   } else {
-    # if a range is specified in the cell.n then sample sizes are random based on that range
-    # the range is -3 to +3 SD for sample size
-    cell.n <- sort(cell.n)
-    cell.min <- cell.n[1]
-    cell.max <- cell.n[2]
-    cell.sd <- (cell.max  - cell.min) / 6
-    cell.mean <- mean(cell.min, cell.max)
-    ns.for.cell1 = abs(round(rnorm(mean = cell.mean, sd = cell.sd, n = number.of.samples)))
+    ns.for.cell1 = rep(cell.n, number.of.samples)
   }
 
 
@@ -62,7 +59,7 @@ get_d_rep_samples <- function(pop.d = NA, cell.n = NA, number.of.samples = 100,
   }
   xx<-1:number.of.samples
   sample.number <- xx
-  data.out <- data.frame(sample.number, pop.d = pop.d, cell1.n = ns.for.cell1, d = ds, LL = LLs, UL = ULs, ci.captured.pop.d = in_interval, t = ts, df = dfs, p = ps)
+  data.out <- data.frame(sample.number, pop.d = pop.d, n = ns.for.cell1, d = ds, LL = LLs, UL = ULs, ci.captured.pop.d = in_interval, t = ts, df = dfs, p = ps)
   rownames(data.out) <- NULL
 
   return(data.out)

@@ -12,7 +12,7 @@ get_middle_percent(sample_statistic, middle_percent = 95)
 \item{middle_percent}{the desired middle percentage (default is 95)}
 }
 \value{
-The percent equal to TRUE
+values that bound the specified middle percent
 }
 \description{
 Calculate the percentage of rows that are true in a column

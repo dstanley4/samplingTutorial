@@ -22,7 +22,7 @@ plot_ci(
 \item{pop.line.width}{thickness of vertical line for parameter}
 }
 \value{
-Data frame with sample d-values
+ggplot object
 }
 \description{
 Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.

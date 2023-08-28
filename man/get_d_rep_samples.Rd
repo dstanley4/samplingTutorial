@@ -5,8 +5,10 @@
 \title{Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.}
 \usage{
 get_d_rep_samples(
-  pop.d = NA,
-  cell.n = NA,
+  pop.d = NULL,
+  n = NULL,
+  mean.n = NULL,
+  sd.n = NULL,
   number.of.samples = 100,
   number.of.decimals = 3,
   alternative = "two.sided",
@@ -16,7 +18,9 @@ get_d_rep_samples(
 \arguments{
 \item{pop.d}{Population d-value}
 
-\item{cell.n}{Cell size for both cells for all samples. If you use two values (e.g., c(20, 40), these represent -3/+3 SD for variable sample sizes}
+\item{mean.n}{Use to specify mean of a distribution of sample sizes. Ignores cell.n if used.}
+
+\item{sd.n}{Use to specify sd of a distribution of sample sizes. Ignores cell.n if used.}
 
 \item{number.of.samples}{Number of samples to obtain}
 
@@ -25,6 +29,8 @@ get_d_rep_samples(
 \item{alternative}{indicates type of alternative hypothesis (e.g., "two.sided") for t.test}
 
 \item{seed.value}{random number seed value}
+
+\item{cell.n}{Cell size for both cells for all samples. If you use two values (e.g., c(20, 40), these represent -3/+3 SD for variable sample sizes}
 }
 \value{
 Data frame with sample d-values

@@ -10,7 +10,7 @@ is_value_in_interval <- function(value, interval) {
 #' Calculate the percentage of rows that are true in a column
 #' @param sample_statistic the column to be examined
 #' @param middle_percent the desired middle percentage (default is 95)
-#' @return The percent equal to TRUE
+#' @return values that bound the specified middle percent
 #'@export
 get_middle_percent <- function(sample_statistic, middle_percent = 95) {
   middle_prop <- round(middle_percent/100,2)
@@ -33,14 +33,14 @@ get_middle_percent <- function(sample_statistic, middle_percent = 95) {
 #' @param x the column to be examined
 #' @return The percent equal to TRUE
 #'@export
-percent_true <- function(x) {
+ci_percent_true <- function(x) {
   sum_TRUE <- sum(x, na.rm = TRUE)
   sum_length <- sum(!is.na(x))
   return(sum_TRUE/sum_length*100)
 }
 
 
-#' Probabilty of a p-value in a specified range
+#' Probability of a p-value in a specified range
 #' @param data simulation data
 #' @param min lower end of range (equal to or greater than)
 #' @param data upper end of range (less than)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc_functions.R
 \name{p_range_count}
 \alias{p_range_count}
-\title{Probabilty of a p-value in a specified range}
+\title{Probability of a p-value in a specified range}
 \usage{
 p_range_count(data, min, max)
 }
@@ -15,5 +15,5 @@ p_range_count(data, min, max)
 The probability
 }
 \description{
-Probabilty of a p-value in a specified range
+Probability of a p-value in a specified range
 }
