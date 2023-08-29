@@ -50,22 +50,22 @@ plot_distribution <- function(.data, type = "text", ...) {
 
 
 
-#' Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
-#' @param data simulation data
+#' Plot p-values for a single distribution
+#' @param .data simulation data
 #' @param type.1.error.prob your choice of alpha. default is .05
 #' @param sig.line.color color of vertical line for significance
 #' @param sig.line.width thickness of vertical line for significance
 #' @return ggplot object
 #' @export
-plot_pvalues <- function(data, type.1.error.prob = .05,
+plot_pvalues <- function(.data, type.1.error.prob = .05,
                          sig.line.color = "green",sig.line.width =1, ...) {
 
 
-  num_row = dim(data)[1]
+  num_row = dim(.data)[1]
   height = num_row/2
 
 
-  pout <- ggplot(data = data,
+  pout <- ggplot(data = .data,
                  mapping = aes(x = p)) +
     geom_histogram(..., breaks = seq(0, 1, by = .01)) +
     scale_x_continuous(breaks = seq(0,1, by = .05)) +
@@ -78,15 +78,19 @@ plot_pvalues <- function(data, type.1.error.prob = .05,
 }
 
 
-#' Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
-#' @param data simulation data
+#' Plot p-values for two distributions
+#' @param .data1 null distribution simulation data
+#' @param .data2 effect distribution simulation data
 #' @param type.1.error.prob your choice of alpha. default is .05
 #' @param sig.line.color color of vertical line for significance
 #' @param sig.line.width thickness of vertical line for significance
 #' @return ggplot object
 #' @export
-plot_compare_pvalues <- function(null_dist, eff_dist, type.1.error.prob = .05,
+plot_compare_pvalues <- function(.data1, .data2, type.1.error.prob = .05,
                          sig.line.color = "green",sig.line.width =1, ...) {
+
+  null_dist = .data1
+  eff_dist  = .data2
 
   num_row = dim(null_dist)[1]
   height = num_row /2
@@ -111,16 +115,16 @@ plot_compare_pvalues <- function(null_dist, eff_dist, type.1.error.prob = .05,
 
 
 #' Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
-#' @param data simulation data
+#' @param .data simulation data
 #' @param capture.colors colors to shade intervals that capture or do not capture parameter
 #' @param pop.line.color color of vertical line for parameter
 #' @param pop.line.width thickness of vertical line for parameter
 #' @return ggplot object
 #' @export
-plot_ci <- function(data, capture.colors = c("red","black"),
+plot_ci <- function(.data, capture.colors = c("red","black"),
                     pop.line.color = "blue", pop.line.width = 1.5, ...) {
 
-  dfnames = names(data)
+  dfnames = names(.data)
   is_d <- "d" %in% dfnames
   is_r <- "r" %in% dfnames
   is_mean <- "m" %in% dfnames
@@ -128,28 +132,28 @@ plot_ci <- function(data, capture.colors = c("red","black"),
   statcol = "x"
 
   lcolor = "black"
-  num_row = dim(data)[1]
+  num_row = dim(.data)[1]
 
   if (is_d == TRUE) {
     statcol = "d"
-    popvalue = data$pop.d
+    popvalue = .data$pop.d
     lcolor = "ci.captured.pop.d"
-    num_captured = sum(data$ci.captured.pop.d)
+    num_captured = sum(.data$ci.captured.pop.d)
     title_str = sprintf("%g of %g intervals captured population d",num_captured, num_row)
   }
 
   if (is_r == TRUE) {
     statcol = "r"
-    popvalue = data$pop.r
+    popvalue = .data$pop.r
     lcolor = "ci.captured.pop.r"
-    num_captured = sum(data$ci.captured.pop.r)
+    num_captured = sum(.data$ci.captured.pop.r)
     title_str = sprintf("%g of %g intervals captured population r", num_captured, num_row)
   }
 
 
 
 
-  pout <- ggplot(data = data,
+  pout <- ggplot(data = .data,
                  mapping = aes_string(x = statcol, y = "sample.number",
                                       xmin = "LL",xmax = "UL", color = lcolor)) +
     geom_errorbarh(...) +

@@ -2,11 +2,11 @@
 % Please edit documentation in R/graphing_functions.R
 \name{plot_compare_pvalues}
 \alias{plot_compare_pvalues}
-\title{Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.}
+\title{Plot p-values for two distributions}
 \usage{
 plot_compare_pvalues(
-  null_dist,
-  eff_dist,
+  .data1,
+  .data2,
   type.1.error.prob = 0.05,
   sig.line.color = "green",
   sig.line.width = 1,
@@ -14,17 +14,19 @@ plot_compare_pvalues(
 )
 }
 \arguments{
+\item{.data1}{null distribution simulation data}
+
+\item{.data2}{effect distribution simulation data}
+
 \item{type.1.error.prob}{your choice of alpha. default is .05}
 
 \item{sig.line.color}{color of vertical line for significance}
 
 \item{sig.line.width}{thickness of vertical line for significance}
-
-\item{data}{simulation data}
 }
 \value{
 ggplot object
 }
 \description{
-Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
+Plot p-values for two distributions
 }

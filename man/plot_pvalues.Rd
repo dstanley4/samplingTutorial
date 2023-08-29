@@ -2,10 +2,10 @@
 % Please edit documentation in R/graphing_functions.R
 \name{plot_pvalues}
 \alias{plot_pvalues}
-\title{Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.}
+\title{Plot p-values for a single distribution}
 \usage{
 plot_pvalues(
-  data,
+  .data,
   type.1.error.prob = 0.05,
   sig.line.color = "green",
   sig.line.width = 1,
@@ -13,7 +13,7 @@ plot_pvalues(
 )
 }
 \arguments{
-\item{data}{simulation data}
+\item{.data}{simulation data}
 
 \item{type.1.error.prob}{your choice of alpha. default is .05}
 
@@ -25,5 +25,5 @@ plot_pvalues(
 ggplot object
 }
 \description{
-Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.
+Plot p-values for a single distribution
 }

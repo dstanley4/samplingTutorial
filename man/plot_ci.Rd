@@ -5,7 +5,7 @@
 \title{Calculate a number of sample d-values (unbiased) based on a specified (infinite) population correlation.}
 \usage{
 plot_ci(
-  data,
+  .data,
   capture.colors = c("red", "black"),
   pop.line.color = "blue",
   pop.line.width = 1.5,
@@ -13,7 +13,7 @@ plot_ci(
 )
 }
 \arguments{
-\item{data}{simulation data}
+\item{.data}{simulation data}
 
 \item{capture.colors}{colors to shade intervals that capture or do not capture parameter}
 
