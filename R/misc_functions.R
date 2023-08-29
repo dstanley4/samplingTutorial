@@ -52,11 +52,23 @@ p_range_count <- function(data,min,max) {
   id_less <- data$p<max
   id_both <- id_greater & id_less
   sum_both <- sum(id_both)
-  prob_value = round(sum_both/num_rows,3)
-  output = sprintf("%g of %g sampes = %1.3f probabilty", sum_both, num_rows, prob_value)
+  prob_value = sum_both/num_rows
+
+
+  output <- list()
+  output$text <- sprintf("%g of %g sampes = %1.3f probabilty", sum_both, num_rows, prob_value)
+  output$count <- sum_both
+  output$prob <- prob_value
+  class(output) <- "pvaluetutorialdata"
+
   return(output)
 }
 
+#' @export
+print.pvaluetutorialdata<- function(x,...) {
+  cat(x$text,"\n")
+  cat("\n")
+}
 
 
 

@@ -93,7 +93,7 @@ plot_compare_pvalues <- function(.data1, .data2, type.1.error.prob = .05,
   eff_dist  = .data2
 
   num_row = dim(null_dist)[1]
-  height = num_row /2
+  height = num_row/100*25
 
 
   inc_value = .01
@@ -105,7 +105,7 @@ plot_compare_pvalues <- function(.data1, .data2, type.1.error.prob = .05,
     scale_x_continuous(breaks = seq(0,.20, by = .01)) +
     labs(y = "Frequency") +
     geom_vline(xintercept = type.1.error.prob, linewidth = sig.line.width, color = sig.line.color) +
-    coord_cartesian(ylim = c(0,height), xlim = c(0, .20)) +
+    coord_cartesian(ylim = c(0,height), xlim = c(0, .15)) +
     theme_classic()
 
   return(pout)
