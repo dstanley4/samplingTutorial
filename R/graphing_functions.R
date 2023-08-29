@@ -33,7 +33,7 @@ plot_distribution <- function(.data, type = "text", ...) {
   if (type == "text") {
     pout <- pout + stat_histotext(label = xvar, ...)
   } else {
-      pout <- poout + geom_histogram(...)
+      pout <- pout + geom_histogram(...)
   }
 
   if (xvar =="r") {
