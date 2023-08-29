@@ -139,7 +139,7 @@ plot_ci <- function(.data, capture.colors = c("red","black"),
     popvalue = .data$pop.d
     lcolor = "ci.captured.pop.d"
     num_captured = sum(.data$ci.captured.pop.d)
-    title_str = sprintf("%g of %g intervals captured population d",num_captured, num_row)
+    title_str = sprintf("%g of %g intervals captured population *d*",num_captured, num_row)
   }
 
   if (is_r == TRUE) {
@@ -159,9 +159,11 @@ plot_ci <- function(.data, capture.colors = c("red","black"),
     geom_errorbarh(...) +
     scale_colour_manual(values = capture.colors) +
     geom_vline(xintercept = popvalue, linewidth = pop.line.width, color = pop.line.color) +
-    labs(y = "Sample Number") +
+    labs(y = "Sample Number", color = "Parameter Captured") +
     ggtitle(title_str) +
-    theme_classic()
+    theme_classic() +
+    theme(legend.position = "none",
+          plot.title = ggtext::element_markdown())
 
 
   return(pout)
