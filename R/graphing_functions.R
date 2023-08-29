@@ -121,8 +121,13 @@ plot_compare_pvalues <- function(.data1, .data2, type.1.error.prob = .05,
 #' @param pop.line.width thickness of vertical line for parameter
 #' @return ggplot object
 #' @export
-plot_ci <- function(.data, capture.colors = c("red","black"),
+plot_ci <- function(.data, number.of.samples = NULL, capture.colors = c("red","black"),
                     pop.line.color = "blue", pop.line.width = 1.5, ...) {
+
+
+  if (is.null(number.of.samples) == FALSE) {
+    .data <- .data[1:number.of.samples,]
+  }
 
   dfnames = names(.data)
   is_d <- "d" %in% dfnames
@@ -157,6 +162,7 @@ plot_ci <- function(.data, capture.colors = c("red","black"),
                  mapping = aes_string(x = statcol, y = "sample.number",
                                       xmin = "LL",xmax = "UL", color = lcolor)) +
     geom_errorbarh(...) +
+    geom_point(shape = 18) +
     scale_colour_manual(values = capture.colors) +
     geom_vline(xintercept = popvalue, linewidth = pop.line.width, color = pop.line.color) +
     labs(y = "Sample Number", color = "Parameter Captured") +

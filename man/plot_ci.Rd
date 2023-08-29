@@ -6,6 +6,7 @@
 \usage{
 plot_ci(
   .data,
+  number.of.samples = NULL,
   capture.colors = c("red", "black"),
   pop.line.color = "blue",
   pop.line.width = 1.5,
