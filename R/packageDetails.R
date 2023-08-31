@@ -16,5 +16,5 @@
 #'Author: \tab David J. Stanley \email{dstanley@@uoguelph.ca}\cr
 #'Maintainer: \tab David J. Stanley \email{dstanley@@uoguelph.ca}
 #'}
-#' @importFrom "ggplot2" "scale_x_continuous"  "ggplot" "geom_histogram" "aes_string" "geom_errorbarh" "geom_vline" "theme_classic" "labs" "ggtitle" "scale_colour_manual" "aes" "coord_cartesian" "theme"
+#' @importFrom "ggplot2" "geom_density" "scale_x_continuous"  "ggplot" "geom_histogram" "aes_string" "geom_errorbarh" "geom_vline" "theme_classic" "labs" "ggtitle" "scale_colour_manual" "aes" "coord_cartesian" "theme"
 NULL

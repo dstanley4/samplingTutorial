@@ -102,3 +102,56 @@ fast_mvrnorm <- function(Sigma, mu, n, K) {
   output$y_true <- ys
   return(output)
 }
+
+
+r_to_z <- function(r) {
+  zvalue <- atanh(r)
+  return(zvalue)
+}
+
+z_to_r <- function(z) {
+  rvalue <- tanh(z)
+  return(rvalue)
+}
+
+r_to_z_se <- function(N) {
+  se_out <-  1 / sqrt(N-3)
+  return(se_out)
+}
+
+
+r_ci_LL <- function(r, n, level = .95) {
+  alpha_level_half = (1 - level)/2
+  LLz <- r_to_z(r) - qnorm(1 -alpha_level_half) * r_to_z_se(n)
+  LL <- z_to_r(LLz)
+}
+
+r_ci_UL <- function(r, n, level = .95) {
+  alpha_level_half = (1 - level)/2
+  ULz <- r_to_z(r) + qnorm(1 -alpha_level_half) * r_to_z_se(n)
+  UL <- z_to_r(ULz)
+}
+
+
+r_tvalue <- function(r, n) {
+  df <- n - 2L
+  tvalue = sqrt(df) * r / sqrt(1 - r^2)
+  return(tvalue)
+}
+
+
+r_pvalue <- function(tvalue, n, level = .95, alternative) {
+  df <- n - 2L
+
+  if (alternative == "less") {
+    pvalue = pt(tvalue, df)
+  } else if (alternative == "greater") {
+    pvalue = pt(tvalue, df, lower.tail = FALSE)
+  } else {
+    pvalue = 2 *  min(pt(tvalue, df),
+                      pt(tvalue, df, lower.tail=FALSE))
+  }
+  return(pvalue)
+}
+
+
