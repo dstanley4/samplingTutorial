@@ -1,18 +1,34 @@
 #' @export
-plot_anim_ci_drep <- function(d = 1, n = 20, level = .95)  {
+plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, graph = "both")  {
+
+  if (is.null(center.level) == TRUE) {
+    center.level = level
+  }
 
 
   df <- n - 1
   tncp = convert_drep_to_t(drep = d, n = n)
 
-  LL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = level)$Lower.Limit
-  UL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = level)$Upper.Limit
+  LL_tlabel <- MBESS::conf.limits.nct(tncp, df, conf.level = level)$Lower.Limit
+  UL_tlabel <- MBESS::conf.limits.nct(tncp, df, conf.level = level)$Upper.Limit
+  LL_dlabel <- convert_t_to_drep(t = LL_tlabel, n = n)
+  UL_dlabel <- convert_t_to_drep(t = UL_tlabel, n = n)
 
+
+
+  LL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = center.level)$Lower.Limit
+  UL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = center.level)$Upper.Limit
   LL_d <- convert_t_to_drep(t = LL_t, n = n)
   UL_d <- convert_t_to_drep(t = UL_t, n = n)
 
-  df_ci      <- samplingTutorial:::get_drep_dist_values(d = d, n = n, level = level)
-  df_outline <- samplingTutorial:::get_drep_dist_values(d = d, n = n, level = level, outline = TRUE)
+  df_ci      <- samplingTutorial:::get_drep_dist_values(d = d, n = n,
+                                                        level = level,
+                                                        center.level = center.level)
+  df_outline <- samplingTutorial:::get_drep_dist_values(d = d, n = n,
+                                                        level = level,
+                                                        center.level = center.level,
+                                                        outline = TRUE)
+
 
   LL_max_density = max(df_ci$LL_density)
   UL_max_density = max(df_ci$UL_density)
@@ -20,39 +36,72 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95)  {
   LL_label_y = LL_max_density + text_offset
   UL_label_y = UL_max_density + text_offset
 
-  ymax <- dt(x = 0, df = df, ncp = 0) * 1.2
-  xmin <- stats::qt(ncp = LL_t, df = df, p = .001)
-  xmax <- stats::qt(ncp = UL_t, df = df, p = .999)
-  xmin <- convert_t_to_drep(xmin, n = n)
-  xmax <- convert_t_to_drep(xmax, n = n)
+  myymax <- dt(x = 0, df = df, ncp = 0) * 1.2
+  myxmin <- stats::qt(ncp = LL_tlabel, df = df, p = .001)
+  myxmax <- stats::qt(ncp = UL_tlabel, df = df, p = .999)
+  myxmin <- convert_t_to_drep(myxmin, n = n)
+  myxmax <- convert_t_to_drep(myxmax, n = n)
 
-  pop_LL_str = sprintf("pop d = %1.2f", LL_d)
-  pop_UL_str = sprintf("pop d = %1.2f", UL_d)
+  pop_LL_str = sprintf("population\nd = %1.2f", LL_d)
+  pop_UL_str = sprintf("population\nd = %1.2f", UL_d)
 
-  ci_base <- ggplot(data = df_ci) +
-    geom_vline(xintercept = d, color = "green") +
+  title_str <- sprintf("d = %1.2f, 95%%[%1.2f, %1.2f]", d, LL_dlabel, UL_dlabel)
+  subtitle_str <- "Non-pivotal CI method (see Kelley, 2007)"
+
+  fontsize = 8
+
+
+  ci_base_LL <- ggplot(data = df_ci) +
+    geom_polygon(mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
+    geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red") +
+    annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
+    annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
+    labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+    annotate(geom = "segment", x = d, xend = d, y = 0, yend = .1*myymax, linewidth = 1) +
+    annotate(geom = "text", size = fontsize, x = d, y = .15*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+    scale_x_continuous(limits = c(myxmin, myxmax)) +
+    scale_y_continuous(limits = c(0, myymax)) +
+    theme_classic(24)
+
+  ci_base_UL <- ggplot(data = df_ci) +
+    geom_polygon(mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, fill = "blue") +
+    geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue") +
+    annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
+    annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
+    labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+    annotate(geom = "segment", x = d, xend = d, y = 0, yend = .1*myymax, linewidth = 1) +
+    annotate(geom = "text", size = fontsize, x = d, y = .15*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+    coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
+    theme_classic(24)
+
+  ci_base_both <- ggplot(data = df_ci) +
     geom_polygon(mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
     geom_polygon(mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, fill = "blue") +
     geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red") +
     geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue") +
-    annotate(geom = "text", x = LL_d, y = .2*ymax, label = "Middle 95%") +
-    annotate(geom = "text", x = UL_d, y = .2*ymax, label = "Middle 95%") +
-    annotate(geom = "text", x = LL_d, y = LL_label_y, label = pop_LL_str) +
-    annotate(geom = "text", x = UL_d, y = UL_label_y, label = pop_UL_str) +
-    labs(x = "d", y = "Density") +
-    coord_cartesian(ylim = c(0, ymax), xlim = c(xmin, xmax)) +
-    ggtitle(sprintf("d = %1.2f, 95%%[%1.2f, %1.2f]", d, LL_d, UL_d)) +
-    theme_classic()
+    annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
+    annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
+    annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
+    annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
+    labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+    annotate(geom = "segment", x = d, xend = d, y = 0, yend = .1*myymax, linewidth = 1) +
+    annotate(geom = "text", size = fontsize, x = d, y = .15*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+    coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
+    theme_classic(24)
 
+  if (graph == "both") {
+    output = ci_base_both
+  } else if (graph == "left") {
+    output = ci_base_LL
+  } else {
+    output = ci_base_UL
+  }
 
-  # geom_density(data = df_ci,
-  #              mapping = aes(x = UL_d_seq, y = UL_density)) +
-
-  return(ci_base)
+  return(output)
 
 }
 
-get_drep_dist_values <- function(d, n, level, outline = FALSE) {
+get_drep_dist_values <- function(d, n, level, center.level, outline = FALSE) {
 
   level_low <- (1-level)/2
   level_high <- 1 - (1-level)/2
@@ -60,8 +109,8 @@ get_drep_dist_values <- function(d, n, level, outline = FALSE) {
   df = n - 1
   tncp = convert_drep_to_t(drep = d, n = n)
 
-  LL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = level)$Lower.Limit
-  UL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = level)$Upper.Limit
+  LL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = center.level)$Lower.Limit
+  UL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = center.level)$Upper.Limit
 
   if (outline == FALSE) {
     LL_left  <- stats::qt(ncp = LL_t, df = df, p = level_low)
