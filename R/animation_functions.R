@@ -22,6 +22,10 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
                                                         level = level,
                                                         center.level = level,
                                                         outline = TRUE)
+  LL_label_max_density = max(df_ci_LL_label$LL_density)
+  UL_label_max_density = max(df_ci_LL_label$UL_density)
+  text_label_offset = max(LL_label_max_density, UL_label_max_density) * .10
+  LL_2label_y = LL_label_max_density + text_label_offset
 
 
   LL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = center.level)$Lower.Limit
@@ -52,7 +56,10 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
   myxmax <- convert_t_to_drep(myxmax, n = n)
 
   pop_LL_str = sprintf("population\nd = %1.2f", LL_d)
+  pop_LL_str2 = sprintf("population\nd = %1.2f", LL_dlabel)
+
   pop_UL_str = sprintf("population\nd = %1.2f", UL_d)
+  pop_UL_str2 = sprintf("population\nd = %1.2f", UL_dlabel)
 
   title_str <- sprintf("d = %1.2f, 95%%[%1.2f, %1.2f]", d, LL_dlabel, UL_dlabel)
   subtitle_str <- "Non-pivotal CI method (see Kelley, 2007)"
@@ -60,52 +67,61 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
   fontsize = 8
 
 
-  ci_base_LL <- ggplot(data = df_ci) +
-    geom_polygon(mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
-    geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
-    annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
-    annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
-    labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
-    annotate(geom = "segment", x = d, xend = d, y = 0, yend = .1*myymax, linewidth = 1) +
-    annotate(geom = "text", size = fontsize, x = d, y = .15*myymax, label = sprintf("sample\nd = %1.2f", d)) +
-    scale_x_continuous(limits = c(myxmin, myxmax)) +
-    scale_y_continuous(limits = c(0, myymax)) +
-    theme_classic(24)
 
-  ci_base_UL <- ggplot(data = df_ci) +
-    geom_polygon(data = df_ci_LL_label,mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
-    geom_path(data = df_outline_LL_label, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
-    geom_polygon(mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, fill = "blue") +
-    geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 2) +
-    annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
-    annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
-    labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
-    annotate(geom = "segment", x = d, xend = d, y = 0, yend = .1*myymax, linewidth = 1) +
-    annotate(geom = "text", size = fontsize, x = d, y = .15*myymax, label = sprintf("sample\nd = %1.2f", d)) +
-    coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
-    theme_classic(24)
 
-  ci_base_both <- ggplot(data = df_ci) +
-    geom_polygon(mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
-    geom_polygon(mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, fill = "blue") +
-    geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
-    geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 2) +
-    annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
-    annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
-    annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
-    annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
-    labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
-    annotate(geom = "segment", x = d, xend = d, y = 0, yend = .1*myymax, linewidth = 1) +
-    annotate(geom = "text", size = fontsize, x = d, y = .15*myymax, label = sprintf("sample\nd = %1.2f", d)) +
-    coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
-    theme_classic(24)
 
-  if (graph == "both") {
-    output = ci_base_both
-  } else if (graph == "left") {
+
+  if (graph == "left") {
+    ci_base_LL <- ggplot(data = df_ci) +
+      geom_polygon(mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
+      geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
+      annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
+      labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+      scale_x_continuous(limits = c(myxmin, myxmax)) +
+      scale_y_continuous(limits = c(0, myymax)) +
+      theme_classic(24)
+
     output = ci_base_LL
-  } else {
+  } else if (graph == "right") {
+    ci_base_UL <- ggplot(data = df_ci) +
+      geom_polygon(data = df_ci_LL_label,mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
+      geom_path(data = df_outline_LL_label, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = LL_2label_y, label = pop_LL_str2, parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = LL_2label_y+text_label_offset, label = "Lower Limit", parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = .2*myymax, label = "Middle 95%") +
+      geom_polygon(mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, fill = "blue") +
+      geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
+      annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
+      labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
+      theme_classic(24)
+
     output = ci_base_UL
+  } else {
+    ci_base_both <- ggplot(data = df_ci) +
+      geom_polygon(mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
+      geom_polygon(mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, fill = "blue") +
+      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = LL_label_y+text_offset, label = "Lower Limit", parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = UL_dlabel, y = UL_label_y+text_offset, label = "Upper Limit", parse = FALSE) +
+      geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
+      geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
+      annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
+      annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
+      labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
+      theme_classic(24)
+
+    output = ci_base_both
   }
 
   return(output)
