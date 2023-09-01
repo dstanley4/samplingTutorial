@@ -14,6 +14,14 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
   LL_dlabel <- convert_t_to_drep(t = LL_tlabel, n = n)
   UL_dlabel <- convert_t_to_drep(t = UL_tlabel, n = n)
 
+  df_ci_LL_label      <- samplingTutorial:::get_drep_dist_values(d = d, n = n,
+                                                        level = level,
+                                                        center.level = level)
+
+  df_outline_LL_label <- samplingTutorial:::get_drep_dist_values(d = d, n = n,
+                                                        level = level,
+                                                        center.level = level,
+                                                        outline = TRUE)
 
 
   LL_t <- MBESS::conf.limits.nct(tncp, df, conf.level = center.level)$Lower.Limit
@@ -24,6 +32,7 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
   df_ci      <- samplingTutorial:::get_drep_dist_values(d = d, n = n,
                                                         level = level,
                                                         center.level = center.level)
+
   df_outline <- samplingTutorial:::get_drep_dist_values(d = d, n = n,
                                                         level = level,
                                                         center.level = center.level,
@@ -53,7 +62,7 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
 
   ci_base_LL <- ggplot(data = df_ci) +
     geom_polygon(mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
-    geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red") +
+    geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
     annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
     annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
     labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
@@ -64,8 +73,10 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
     theme_classic(24)
 
   ci_base_UL <- ggplot(data = df_ci) +
+    geom_polygon(data = df_ci_LL_label,mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
+    geom_path(data = df_outline_LL_label, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
     geom_polygon(mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, fill = "blue") +
-    geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue") +
+    geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 1) +
     annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
     annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
     labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
@@ -77,8 +88,8 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
   ci_base_both <- ggplot(data = df_ci) +
     geom_polygon(mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
     geom_polygon(mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, fill = "blue") +
-    geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red") +
-    geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue") +
+    geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
+    geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 2) +
     annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
     annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
     annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
