@@ -82,9 +82,25 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
       annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
       scale_x_continuous(limits = c(myxmin, myxmax)) +
       scale_y_continuous(limits = c(0, myymax)) +
+      annotate(geom = "text", size = 10, x = d, y = myymax, label = "Step 2: Iteratively DECREASE population d until the edge of the middle 95% touches d.\nNotice how the sampling distribution changes skew/shape.") +
       theme_classic(24)
 
     output = ci_base_LL
+  } else if (graph == "leftfreeze") {
+    ci_base_LLfreeze <- ggplot(data = df_ci) +
+      geom_polygon(data = df_ci_LL_label,mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
+      geom_path(data = df_outline_LL_label, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = LL_2label_y, label = pop_LL_str2, parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = LL_2label_y+text_label_offset, label = "Lower Limit", parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = .2*myymax, label = "Middle 95%") +
+      labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
+      annotate(geom = "text", size = 10, x = d, y = myymax , label = "We have found the Lower Limit of the confidence interval.") +
+    theme_classic(24)
+
+    output = ci_base_LLfreeze
   } else if (graph == "right") {
     ci_base_UL <- ggplot(data = df_ci) +
       geom_polygon(data = df_ci_LL_label,mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
@@ -100,6 +116,7 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
       annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
       annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
       coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
+      annotate(geom = "text", size = 10, x = d, y = myymax, label = "Step #: Iteratively INCREASE population d until the edge of the middle 95% touches d.\nNotice how the sampling distribution changes skew/shape.") +
       theme_classic(24)
 
     output = ci_base_UL
@@ -117,7 +134,7 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
       annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
       labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
       annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
-      annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+      annotate(geom = "text",  size = 10, size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
       coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
       theme_classic(24)
 
