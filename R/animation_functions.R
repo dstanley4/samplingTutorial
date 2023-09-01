@@ -190,5 +190,37 @@ convert_t_to_drep <- function(t, n) {
   return(drep)
 }
 
+misc_function <- function() {
+  center.levels <- seq(0, .95, by = .005)
+  L = length(center.levels)
+  number_frames = 2 * L + 30
+  i = 0
+
+  png("videotest%05d.png", width = 1920, height = 1080, res = 72)
+  for (cur.center in center.levels) {
+    print(plot_anim_ci_drep(d = 1, n = 20, center.level = cur.center, graph = "left"))
+    i = i + 1
+    print(sprintf("%1.0f%% Done creating frames.", i/number_frames*100))
+  }
+
+  for (cur.center in center.levels) {
+    print(plot_anim_ci_drep(d = 1, n = 20, center.level = cur.center, graph = "right"))
+    i = i + 1
+    print(sprintf("%1.0f%% Done creating frames.", i/number_frames*100))
+  }
+  for (j in 1:30) {
+    print(plot_anim_ci_drep(d = 1, n = 20, center.level = .95, graph = "both"))
+    i = i + 1
+    print(sprintf("%1.0f%% Done creating frames.", i/number_frames*100))
+  }
+  dev.off()
+
+  png_files <- sprintf("videotest%05d.png", 1:number_frames)
+  av::av_encode_video(png_files, 'output.mp4', framerate = 15)
+  file.remove(png_files)
+  utils::browseURL('output.mp4')
+
+  return("")
+}
 
 
