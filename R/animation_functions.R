@@ -62,27 +62,33 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
   pop_UL_str2 = sprintf("population\nd = %1.2f", UL_dlabel)
 
   title_str <- sprintf("d = %1.2f, 95%%[%1.2f, %1.2f]", d, LL_dlabel, UL_dlabel)
-  subtitle_str <- "Non-pivotal CI method (see Kelley, 2007)"
+  subtitle_str <- "Nonpivotal CI method (see Kelley, 2007)"
 
   fontsize = 8
 
 
 
+  if (graph == "justeffect") {
+    ci_start <- ggplot(data = df_ci) +
+      labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
+      annotate(geom = "text", size = 10, x = d, y = myymax*1.1, label = "Step 1: Sample d-value\nWe start with the sample d-value.", hjust = 0) +
+      theme_classic(24)
+    output = ci_start
 
-
-
-  if (graph == "left") {
+  } else if (graph == "left") {
     ci_base_LL <- ggplot(data = df_ci) +
       geom_polygon(mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, fill = "red") +
       geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
-      annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
+      annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%\nof sample d-values") +
       annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
       labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
       annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
       annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
-      scale_x_continuous(limits = c(myxmin, myxmax)) +
-      scale_y_continuous(limits = c(0, myymax)) +
-      annotate(geom = "text", size = 10, x = d, y = myymax, label = "Step 2: Iteratively DECREASE population d until the edge of the middle 95% touches d.\nNotice how the sampling distribution changes skew/shape.") +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
+      annotate(geom = "text", size = 10, x = d, y = myymax*1.1, label = "Step 2 Lower Limit:\nIteratively DECREASE hypothetical population d-value\nuntil the edge of the middle 95% is the sample d-value.\nNotice how the sampling distribution changes skew/shape.", hjust = 0) +
       theme_classic(24)
 
     output = ci_base_LL
@@ -92,12 +98,12 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
       geom_path(data = df_outline_LL_label, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
       annotate(geom = "text", size = fontsize, x = LL_dlabel, y = LL_2label_y, label = pop_LL_str2, parse = FALSE) +
       annotate(geom = "text", size = fontsize, x = LL_dlabel, y = LL_2label_y+text_label_offset, label = "Lower Limit", parse = FALSE) +
-      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = .2*myymax, label = "Middle 95%") +
+      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = .2*myymax, label = "Middle 95%\nof sample d-values") +
       labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
       annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
       annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
-      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
-      annotate(geom = "text", size = 10, x = d, y = myymax , label = "We have found the Lower Limit of the confidence interval.") +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
+      annotate(geom = "text", size = 10, x = d, y = myymax*1.1 , label = "We have found the Lower Limit of the confidence interval.") +
     theme_classic(24)
 
     output = ci_base_LLfreeze
@@ -107,16 +113,16 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
       geom_path(data = df_outline_LL_label, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
       annotate(geom = "text", size = fontsize, x = LL_dlabel, y = LL_2label_y, label = pop_LL_str2, parse = FALSE) +
       annotate(geom = "text", size = fontsize, x = LL_dlabel, y = LL_2label_y+text_label_offset, label = "Lower Limit", parse = FALSE) +
-      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = .2*myymax, label = "Middle 95%") +
+      annotate(geom = "text", size = fontsize, x = LL_dlabel, y = .2*myymax, label = "Middle 95%\nof sample d-values") +
       geom_polygon(mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, fill = "blue") +
       geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 2) +
-      annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
+      annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%\nof sample d-values") +
       annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
       labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
       annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
       annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
-      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
-      annotate(geom = "text", size = 10, x = d, y = myymax, label = "Step #: Iteratively INCREASE population d until the edge of the middle 95% touches d.\nNotice how the sampling distribution changes skew/shape.") +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
+      annotate(geom = "text", size = 10, x = d, y = myymax*1.1, label = "Step 3 Upper Limit:\nIteratively INCREASE hypothetical population d-value\nuntil the edge of the middle 95% is the sample d-value.\nNotice how the sampling distribution changes skew/shape.", hjust = 0) +
       theme_classic(24)
 
     output = ci_base_UL
@@ -128,14 +134,14 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
       annotate(geom = "text", size = fontsize, x = UL_dlabel, y = UL_label_y+text_offset, label = "Upper Limit", parse = FALSE) +
       geom_path(data = df_outline, mapping = aes(x = LL_d_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
       geom_path(data = df_outline, mapping = aes(x = UL_d_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 2) +
-      annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%") +
-      annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%") +
+      annotate(geom = "text", size = fontsize, x = LL_d, y = .2*myymax, label = "Middle 95%\nof sample d-values") +
+      annotate(geom = "text", size = fontsize, x = UL_d, y = .2*myymax, label = "Middle 95%\nof sample d-values") +
       annotate(geom = "text", size = fontsize, x = LL_d, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
       annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
       labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
       annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
       annotate(geom = "text",  size = 10, size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
-      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
       theme_classic(24)
 
     output = ci_base_both
