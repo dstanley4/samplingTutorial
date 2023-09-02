@@ -1,4 +1,3 @@
-#' @export
 plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, graph = "both")  {
 
   if (is.null(center.level) == TRUE) {
@@ -140,7 +139,7 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
       annotate(geom = "text", size = fontsize, x = UL_d, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
       labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
       annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
-      annotate(geom = "text",  size = 10, size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
+      annotate(geom = "text",  size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
       coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
       theme_classic(24)
 
@@ -213,35 +212,72 @@ convert_t_to_drep <- function(t, n) {
   return(drep)
 }
 
-misc_function <- function() {
+#' Create animation of nonpivotal CI for d-repeated measures
+#' @param d sample d value
+#' @param n sample size
+#' @param filename filename for video (default: output.mp4). Must end in .mp4
+#' @param level confidence level (default: .95)
+#' @return ggplot object
+#' @export
+nonpivotal_ci_d_rep <- function(d, n, filename = "output.mp4", level = .95) {
+
   center.levels <- seq(0, .95, by = .005)
   L = length(center.levels)
-  number_frames = 2 * L + 30
+  number_frames = 2 * L + 60 + 30 + 60
   i = 0
 
-  png("videotest%05d.png", width = 1920, height = 1080, res = 72)
-  for (cur.center in center.levels) {
-    print(plot_anim_ci_drep(d = 1, n = 20, center.level = cur.center, graph = "left"))
+
+  pb <- txtProgressBar(min = 0,      # Minimum value of the progress bar
+                       max = number_frames, # Maximum value of the progress bar
+                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
+                       width = 50,   # Progress bar width. Defaults to getOption("width")
+                       char = "=")   # Character used to create the bar
+
+
+
+  #png("videotest%05d.png", width = 1920, height = 1080, res = 72)
+
+  pngfilenames = paste0(tempdir(), "/videotest%05d.png")
+  png(pngfilenames, width = 1920, height = 1080, res = 72)
+
+
+  for (j in 1:60) {
+    print(plot_anim_ci_drep(d = d, n = n, level = level, center.level = level, graph = "justeffect"))
     i = i + 1
-    print(sprintf("%1.0f%% Done creating frames.", i/number_frames*100))
+    setTxtProgressBar(pb, i)
+  }
+
+
+  for (cur.center in center.levels) {
+    print(plot_anim_ci_drep(d = d, n = n, level = level, center.level = cur.center, graph = "left"))
+    i = i + 1
+    setTxtProgressBar(pb, i)
+  }
+
+  for (j in 1:60) {
+    print(plot_anim_ci_drep(d = d, n = n, level = level, center.level = level, graph = "leftfreeze"))
+    i = i + 1
+    setTxtProgressBar(pb, i)
   }
 
   for (cur.center in center.levels) {
-    print(plot_anim_ci_drep(d = 1, n = 20, center.level = cur.center, graph = "right"))
+    print(plot_anim_ci_drep(d = d, n = n, level = level, center.level = cur.center, graph = "right"))
     i = i + 1
-    print(sprintf("%1.0f%% Done creating frames.", i/number_frames*100))
+    setTxtProgressBar(pb, i)
   }
   for (j in 1:30) {
-    print(plot_anim_ci_drep(d = 1, n = 20, center.level = .95, graph = "both"))
+    print(plot_anim_ci_drep(d = d, n = n, level = level, center.level = level, graph = "both"))
     i = i + 1
-    print(sprintf("%1.0f%% Done creating frames.", i/number_frames*100))
+    setTxtProgressBar(pb, i)
   }
+  close(pb)
+
   dev.off()
 
-  png_files <- sprintf("videotest%05d.png", 1:number_frames)
-  av::av_encode_video(png_files, 'output.mp4', framerate = 15)
+  png_files <- sprintf(pngfilenames, 1:number_frames)
+  av::av_encode_video(png_files, filename, framerate = 15, verbose = FALSE)
   file.remove(png_files)
-  utils::browseURL('output.mp4')
+  utils::browseURL(filename)
 
   return("")
 }
