@@ -4,14 +4,14 @@
 \alias{nonpivotal_ci_d_rep}
 \title{Create animation of nonpivotal CI for d-repeated measures}
 \usage{
-nonpivotal_ci_d_rep(d, n, filename = "output.mp4", level = 0.95)
+nonpivotal_ci_d_rep(d, n, filename = "video-d-rep.mp4", level = 0.95)
 }
 \arguments{
 \item{d}{sample d value}
 
 \item{n}{sample size}
 
-\item{filename}{filename for video (default: output.mp4). Must end in .mp4}
+\item{filename}{filename for video (default: video-d-rep.mp4). Must end in .mp4}
 
 \item{level}{confidence level (default: .95)}
 }
