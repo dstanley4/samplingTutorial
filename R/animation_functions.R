@@ -60,7 +60,7 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
   pop_UL_str = sprintf("population\nd = %1.2f", UL_d)
   pop_UL_str2 = sprintf("population\nd = %1.2f", UL_dlabel)
 
-  title_str <- sprintf("d = %1.2f, 95%%[%1.2f, %1.2f]", d, LL_dlabel, UL_dlabel)
+  title_str <- sprintf("d = %1.2f, 95%%[%1.2f, %1.2f], N = ", d, LL_dlabel, UL_dlabel, n)
   subtitle_str <- "Nonpivotal CI method (see Kelley, 2007)"
 
   fontsize = 8
