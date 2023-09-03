@@ -1,5 +1,8 @@
 
 
+# d repeated measures -----------------------------------------------------
+
+
 convert_drep_to_t <- function(drep, n) {
   t <- drep * sqrt(n)
   return(t)
@@ -74,8 +77,8 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
   pop_UL_str = sprintf("population\nd = %1.2f", UL_d)
   pop_UL_str2 = sprintf("population\nd = %1.2f", UL_dlabel)
 
-  title_str <- sprintf("d.rep = %1.2f, 95%%[%1.2f, %1.2f], N = %g", d, LL_dlabel, UL_dlabel, n)
-  subtitle_str <- "Nonpivotal CI method (see Kelley, 2007)"
+  subtitle_str <- sprintf("d.rep = %1.2f, 95%%[%1.2f, %1.2f], N = %g", d, LL_dlabel, UL_dlabel, n)
+  title_str <- "Nonpivotal CI method (see Kelley, 2007)"
 
   fontsize = 8
 
@@ -286,6 +289,7 @@ nonpivotal_ci_d_rep <- function(d, n, filename = "video-d-rep.mp4", level = .95)
   return("")
 }
 
+# d independent groups -----------------------------------------------------
 
 
 
@@ -364,8 +368,8 @@ plot_anim_ci_dindep <- function(d = 1, n.1 = 20, n.2 = 20, level = .95, center.l
   pop_UL_str = sprintf("population\nd = %1.2f", UL_d)
   pop_UL_str2 = sprintf("population\nd = %1.2f", UL_dlabel)
 
-  title_str <- sprintf("d.indep = %1.2f, 95%%[%1.2f, %1.2f], n.1 = %g, n.2 = %g", d, LL_dlabel, UL_dlabel, n.1, n.2)
-  subtitle_str <- "Nonpivotal CI method (see Kelley, 2007)"
+  subtitle_str <- sprintf("d.indep = %1.2f, 95%%[%1.2f, %1.2f], n.1 = %g, n.2 = %g", d, LL_dlabel, UL_dlabel, n.1, n.2)
+  title_str <- "Nonpivotal CI method (see Kelley, 2007)"
 
   fontsize = 8
 
@@ -576,6 +580,338 @@ get_dindep_dist_values <- function(d, n.1, n.2, level, center.level, outline = F
 
   return(output)
 }
+
+
+# Correlation -------------------------------------------------------------
+
+
+
+ci_r <- function(r,n,conf.level) {
+  probability_in_tail <- (1- conf.level)/2
+
+  obs_z <- atanh(r)
+  obs_z_se <- 1/sqrt(n-3)
+
+  high_z <- stats::qnorm(p=probability_in_tail, mean=obs_z,sd=obs_z_se,lower.tail=FALSE)
+  high_r <- tanh(high_z)
+
+  low_z <- stats::qnorm(p=probability_in_tail, mean=obs_z,sd=obs_z_se,lower.tail=TRUE)
+  low_r <- tanh(low_z)
+
+
+  conf_interval_output <- list()
+
+  conf_interval_output$r <- r
+  conf_interval_output$lower_conf_limit_r <- low_r
+  conf_interval_output$upper_conf_limit_r <- high_r
+  return(conf_interval_output)
+}
+
+convert_r_to_z <- function(r) {
+  z <- atanh(r)
+  return(z)
+}
+
+
+convert_z_to_r <- function(z) {
+  r <- tanh(z)
+  return(r)
+}
+
+
+plot_anim_ci_correlation <- function(r = .5, n=20, level = .95, center.level = NULL, graph = "both")  {
+
+
+
+
+  if (is.null(center.level) == TRUE) {
+    center.level = level
+  }
+
+  zncp = convert_r_to_z(r = r)
+
+  rci_info <- ci_r(r = r, n = n, conf.level = level)
+  LL_rlabel <- rci_info$lower_conf_limit_r
+  UL_rlabel <- rci_info$upper_conf_limit_r
+  LL_zlabel <- convert_r_to_z(LL_rlabel)
+  UL_zlabel <- convert_r_to_z(UL_rlabel)
+
+  df_ci_LL_label      <- samplingTutorial:::get_r_dist_values(r = r, n = n,
+                                                                   level = level,
+                                                                   center.level = level)
+
+  df_outline_LL_label <- samplingTutorial:::get_r_dist_values(r = r, n = n,
+                                                                   level = level,
+                                                                   center.level = level,
+                                                                   outline = TRUE)
+  LL_label_max_density = max(df_ci_LL_label$LL_density)
+  UL_label_max_density = max(df_ci_LL_label$UL_density)
+  text_label_offset = max(LL_label_max_density, UL_label_max_density) * .10
+  LL_2label_y = LL_label_max_density + text_label_offset
+
+
+
+
+  rci_info <- ci_r(r = r, n = n, conf.level = center.level)
+  LL_r <- rci_info$lower_conf_limit_r
+  UL_r <- rci_info$upper_conf_limit_r
+  LL_z <- convert_r_to_z(LL_r)
+  UL_z <- convert_r_to_z(UL_r)
+
+  df_ci      <- samplingTutorial:::get_r_dist_values(r = r, n = n,
+                                                          level = level,
+                                                          center.level = center.level)
+
+  df_outline <- samplingTutorial:::get_r_dist_values(r = r, n = n,
+                                                          level = level,
+                                                          center.level = center.level,
+                                                          outline = TRUE)
+
+
+  LL_max_density = max(df_ci$LL_density)
+  UL_max_density = max(df_ci$UL_density)
+  text_offset = max(LL_max_density, UL_max_density) * .10
+  LL_label_y = LL_max_density + text_offset
+  UL_label_y = UL_max_density + text_offset
+
+  obs_z_se <- 1/sqrt(n-3)
+
+  myymax <- dnorm(x = 0, mean = 0, sd = obs_z_se) * 1.2
+
+  myxmin <- stats::qnorm(mean = convert_r_to_z(LL_rlabel), sd = obs_z_se, p = .001)
+  myxmax <- stats::qnorm(mean = convert_r_to_z(UL_rlabel), sd = obs_z_se, p = .999)
+
+  myxmin <- convert_z_to_r(myxmin)
+  myxmax <- convert_z_to_r(myxmax)
+
+  pop_LL_str = sprintf("population\nr = %1.2f", LL_r)
+  pop_LL_str2 = sprintf("population\nr = %1.2f", LL_rlabel)
+
+  pop_UL_str = sprintf("population\nr = %1.2f", UL_r)
+  pop_UL_str2 = sprintf("population\nr = %1.2f", UL_rlabel)
+
+  subtitle_str <- sprintf("r = %1.2f, 95%%[%1.2f, %1.2f], n = %g", r, LL_rlabel, UL_rlabel, n)
+  title_str <- "Nonpivotal CI method (see Kelley, 2007)"
+
+  fontsize = 8
+
+  if (graph == "justeffect") {
+    ci_start <- ggplot(data = df_ci) +
+      labs(x = "correlation", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = r, xend = r, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text", size = fontsize, x = r, y = .35*myymax, label = sprintf("sample\nr = %1.2f", r)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
+      annotate(geom = "text", size = 10, x = r, y = myymax*1.1, label = "Step 1: Sample r-value\nWe start with the sample d-value.", hjust = 0) +
+      theme_classic(24)
+    output = ci_start
+
+  } else if (graph == "left") {
+    ci_base_LL <- ggplot(data = df_ci) +
+      geom_polygon(mapping = aes(x = LL_r_seq, y = LL_density), alpha = .5, fill = "red") +
+      geom_path(data = df_outline, mapping = aes(x = LL_r_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = LL_r, y = .2*myymax, label = "Middle 95%\nof sample r-values") +
+      annotate(geom = "text", size = fontsize, x = LL_r, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
+      labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = r, xend = r, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text", size = fontsize, x = r, y = .35*myymax, label = sprintf("sample\nr = %1.2f", r)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
+      annotate(geom = "text", size = 10, x = r, y = myymax*1.1, label = "Step 2 Lower Limit:\nIteratively DECREASE hypothetical population r-value\nuntil the edge of the middle 95% is the sample r-value.\nNotice how the sampling distribution changes skew/shape.", hjust = 0) +
+      theme_classic(24)
+
+    output = ci_base_LL
+  } else if (graph == "leftfreeze") {
+    ci_base_LLfreeze <- ggplot(data = df_ci) +
+      geom_polygon(data = df_ci_LL_label,mapping = aes(x = LL_r_seq, y = LL_density), alpha = .5, fill = "red") +
+      geom_path(data = df_outline_LL_label, mapping = aes(x = LL_r_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = LL_rlabel, y = LL_2label_y, label = pop_LL_str2, parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = LL_rlabel, y = LL_2label_y+text_label_offset, label = "Lower Limit", parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = LL_rlabel, y = .2*myymax, label = "Middle 95%\nof sample r-values") +
+      labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = r, xend = r, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text", size = fontsize, x = r, y = .35*myymax, label = sprintf("sample\nr = %1.2f", r)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
+      annotate(geom = "text", size = 10, x = r, y = myymax*1.1 , label = "We have found the Lower Limit of the confidence interval.") +
+      theme_classic(24)
+
+    output = ci_base_LLfreeze
+  } else if (graph == "right") {
+    ci_base_UL <- ggplot(data = df_ci) +
+      geom_polygon(data = df_ci_LL_label,mapping = aes(x = LL_r_seq, y = LL_density), alpha = .5, fill = "red") +
+      geom_path(data = df_outline_LL_label, mapping = aes(x = LL_r_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = LL_rlabel, y = LL_2label_y, label = pop_LL_str2, parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = LL_rlabel, y = LL_2label_y+text_label_offset, label = "Lower Limit", parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = LL_rlabel, y = .2*myymax, label = "Middle 95%\nof sample r-values") +
+      geom_polygon(mapping = aes(x = UL_r_seq, y = UL_density), alpha = .5, fill = "blue") +
+      geom_path(data = df_outline, mapping = aes(x = UL_r_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = UL_r, y = .2*myymax, label = "Middle 95%\nof sample r-values") +
+      annotate(geom = "text", size = fontsize, x = UL_r, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
+      labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = r, xend = r, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text", size = fontsize, x = r, y = .35*myymax, label = sprintf("sample\nr = %1.2f", r)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
+      annotate(geom = "text", size = 10, x = r, y = myymax*1.1, label = "Step 3 Upper Limit:\nIteratively INCREASE hypothetical population r-value\nuntil the edge of the middle 95% is the sample r-value.\nNotice how the sampling distribution changes skew/shape.", hjust = 0) +
+      theme_classic(24)
+
+    output = ci_base_UL
+  } else {
+    ci_base_both <- ggplot(data = df_ci) +
+      geom_polygon(mapping = aes(x = LL_r_seq, y = LL_density), alpha = .5, fill = "red") +
+      geom_polygon(mapping = aes(x = UL_r_seq, y = UL_density), alpha = .5, fill = "blue") +
+      annotate(geom = "text", size = fontsize, x = LL_rlabel, y = LL_label_y+text_offset, label = "Lower Limit", parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = UL_rlabel, y = UL_label_y+text_offset, label = "Upper Limit", parse = FALSE) +
+      geom_path(data = df_outline, mapping = aes(x = LL_r_seq, y = LL_density), alpha = .5, color = "red", linewidth = 2) +
+      geom_path(data = df_outline, mapping = aes(x = UL_r_seq, y = UL_density), alpha = .5, color = "blue", linewidth = 2) +
+      annotate(geom = "text", size = fontsize, x = LL_r, y = .2*myymax, label = "Middle 95%\nof sample r-values") +
+      annotate(geom = "text", size = fontsize, x = UL_r, y = .2*myymax, label = "Middle 95%\nof sample r-values") +
+      annotate(geom = "text", size = fontsize, x = LL_r, y = LL_label_y, label = pop_LL_str, parse = FALSE) +
+      annotate(geom = "text", size = fontsize, x = UL_r, y = UL_label_y, label = pop_UL_str, parse = FALSE) +
+      labs(x = "d", y = "Density", title = title_str, subtitle = subtitle_str) +
+      annotate(geom = "segment", x = r, xend = r, y = 0, yend = .3*myymax, linewidth = 1) +
+      annotate(geom = "text",  size = fontsize, x = r, y = .35*myymax, label = sprintf("sample\nr = %1.2f", r)) +
+      coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
+      theme_classic(24)
+
+    output = ci_base_both
+  }
+
+  return(output)
+
+}
+
+
+#' Create animation of nonpivotal CI for correlation
+#' @param r sample d value
+#' @param n sample size
+#' @param filename filename for video (default: video-d-indep.mp4). Must end in .mp4
+#' @param level confidence level (default: .95)
+#' @return ggplot object
+#' @export
+nonpivotal_ci_r <- function(r, n, filename = "video-r.mp4", level = .95) {
+
+  center.levels <- seq(0, .95, by = .005)
+  L = length(center.levels)
+  number_frames = 2 * L + 60 + 30 + 60
+  i = 0
+
+
+  pb <- txtProgressBar(min = 0,      # Minimum value of the progress bar
+                       max = number_frames, # Maximum value of the progress bar
+                       style = 3,    # Progress bar style (also available style = 1 and style = 2)
+                       width = 50,   # Progress bar width. Defaults to getOption("width")
+                       char = "=")   # Character used to create the bar
+
+
+
+  #png("videotest%05d.png", width = 1920, height = 1080, res = 72)
+
+  pngfilenames = paste0(tempdir(), "/videotest%05d.png")
+  png(pngfilenames, width = 1920, height = 1080, res = 72)
+
+
+  for (j in 1:60) {
+    print(plot_anim_ci_correlation(r = r, n = n, level = level, center.level = level, graph = "justeffect"))
+    i = i + 1
+    setTxtProgressBar(pb, i)
+  }
+
+
+  for (cur.center in center.levels) {
+    print(plot_anim_ci_correlation(r = r, n = n, level = level, center.level = cur.center, graph = "left"))
+    i = i + 1
+    setTxtProgressBar(pb, i)
+  }
+
+  for (j in 1:60) {
+    print(plot_anim_ci_correlation(r = r, n = n, level = level, center.level = level, graph = "leftfreeze"))
+    i = i + 1
+    setTxtProgressBar(pb, i)
+  }
+
+  for (cur.center in center.levels) {
+    print(plot_anim_ci_correlation(r = r, n = n, level = level, center.level = cur.center, graph = "right"))
+    i = i + 1
+    setTxtProgressBar(pb, i)
+  }
+  for (j in 1:30) {
+    print(plot_anim_ci_correlation(r = r, n = n, level = level, center.level = level, graph = "both"))
+    i = i + 1
+    setTxtProgressBar(pb, i)
+  }
+  close(pb)
+
+  dev.off()
+
+  png_files <- sprintf(pngfilenames, 1:number_frames)
+  av::av_encode_video(png_files, filename, framerate = 15, verbose = FALSE)
+  file.remove(png_files)
+  utils::browseURL(filename)
+
+  return("")
+}
+
+
+get_r_dist_values <- function(r, n, level, center.level, outline = FALSE) {
+
+  level_low <- (1-level)/2
+  level_high <- 1 - (1-level)/2
+
+  zncp = convert_r_to_z(r)
+  obs_z_se <- 1/sqrt(n-3)
+
+
+  rci_info <- ci_r(r = r, n = n, conf.level = level)
+  LL_rlabel <- rci_info$lower_conf_limit_r
+  UL_rlabel <- rci_info$upper_conf_limit_r
+  LL_zlabel <- convert_r_to_z(LL_rlabel)
+  UL_zlabel <- convert_r_to_z(UL_rlabel)
+
+
+  LL_r <- ci_r(r = r, n = n, conf.level = center.level)$lower_conf_limit_r
+  UL_r <- ci_r(r = r, n = n, conf.level = center.level)$upper_conf_limit_r
+  LL_z <- convert_r_to_z(LL_r)
+  UL_z <- convert_r_to_z(UL_r)
+
+  if (outline == FALSE) {
+    LL_left  <- stats::qnorm(mean = LL_z, sd = obs_z_se, p = level_low)
+    LL_right <- stats::qnorm(mean = LL_z, sd = obs_z_se, p = level_high)
+
+    UL_left   <- stats::qnorm(mean = UL_z, sd = obs_z_se, p = level_low)
+    UL_right  <- stats::qnorm(mean = UL_z, sd = obs_z_se, p = level_high)
+
+  } else {
+    LL_left  <- stats::qnorm(mean = LL_z, sd = obs_z_se, p = .001)
+    LL_right <- stats::qnorm(mean = LL_z, sd = obs_z_se, p = .999)
+
+    UL_left   <- stats::qnorm(mean = UL_z, sd = obs_z_se, p = .001)
+    UL_right  <- stats::qnorm(mean = UL_z, sd = obs_z_se, p = .999)
+  }
+
+
+  LL_z_seq <- seq(LL_left, LL_right, by = (LL_right - LL_left)/500)
+  UL_z_seq <- seq(UL_left, UL_right, by = (UL_right - UL_left)/500)
+
+  LL_r_seq <- convert_z_to_r(LL_z_seq)
+  UL_r_seq <- convert_z_to_r(UL_z_seq)
+
+  LL_density <- stats::dnorm(x = LL_z_seq, mean = LL_z, sd = obs_z_se)
+  UL_density <- stats::dnorm(x = UL_z_seq, mean = UL_z, sd = obs_z_se)
+
+  LL_density[1] <- 0
+  LL_density[length(LL_density)] <- 0
+
+  UL_density[1] <- 0
+  UL_density[length(UL_density)] <- 0
+
+  output <- data.frame(LL_z_seq, UL_z_seq,
+                       LL_r_seq, UL_r_seq,
+                       LL_density, UL_density)
+  output <- rbind(output, output[1,])
+
+  return(output)
+}
+
+
+
 
 
 
