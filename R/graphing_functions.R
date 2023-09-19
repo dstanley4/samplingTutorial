@@ -8,7 +8,7 @@ plot_distribution <- function(.data, type = "text", ...) {
   dfnames = names(.data)
   is_d <- "d" %in% dfnames
   is_r <- "r" %in% dfnames
-  is_mean <- "m" %in% dfnames
+  is_mean <- "sample.mean" %in% dfnames
 
   statcol = "x"
 
@@ -17,21 +17,30 @@ plot_distribution <- function(.data, type = "text", ...) {
 
   if (is_d == TRUE) {
     xvar = "d"
+    xlabel = xvar
     popvalue = .data$pop.d
   }
 
   if (is_r == TRUE) {
     xvar = "r"
+    xlabel = xvar
     popvalue = .data$pop.r
 
   }
+
+  if (is_mean == TRUE) {
+    xvar = "sample.mean"
+    xlabel = "bar(x)"
+    popvalue = .data$pop.mean
+  }
+
 
 
   pout <- ggplot(data = .data,
                  mapping = aes_string(x = xvar))
 
   if (type == "text") {
-    pout <- pout + stat_histotext(label = xvar, ...)
+    pout <- pout + stat_histotext(label = xlabel, ...)
   } else {
       pout <- pout + geom_histogram(...)
   }
