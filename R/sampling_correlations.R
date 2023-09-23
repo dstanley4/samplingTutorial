@@ -92,7 +92,7 @@ get_r_samples_fast <- function(pop.r = NA, n, number.of.samples = 100,
   sample.z = rnorm(mean = pop.z, sd = pop.se.z, n = number.of.samples)
   sample.r = samplingTutorial:::z_to_r(sample.z)
 
-  rs <- sample.r
+  rs <- round(sample.r,2)
   dfs <- n - 2L
   ts <- r_tvalue(rs, n)
   ps <- rep(NA, number.of.samples)
