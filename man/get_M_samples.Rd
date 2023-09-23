@@ -34,6 +34,8 @@ get_M_samples(
 
 \item{n.max}{Use various sample sizes. Uniform distribution max}
 
+\item{label}{label for all studies}
+
 \item{pop.data}{Data to use for population (optional)}
 
 \item{pop.column.name}{Column name from data to use for sampling (optional)}

@@ -9,6 +9,7 @@
 #' @param seed.value random number seed value
 #' @param n.min Use various sample sizes. Uniform distribution min.
 #' @param n.max Use various sample sizes. Uniform distribution max
+#' @param label label for all studies
 #' @return Data frame with desired properties
 #' @examples
 #' get_M_samples(pop.M = 100, pop.SD = 15, n = 100)

@@ -140,7 +140,7 @@ r_tvalue <- function(r, n) {
 }
 
 
-r_pvalue <- function(tvalue, n, level = .95, alternative) {
+r_pvalue <- function(tvalue, n, level = .95, alternative = "two.sided") {
   df <- n - 2L
 
   if (alternative == "less") {
