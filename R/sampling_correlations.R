@@ -47,10 +47,6 @@ get_r_samples <- function(pop.r = NA, n, number.of.samples = 100, number.of.deci
   rownames(data.out) <- NULL
 
 
-  pi_in_interval[i] <- is_value_in_interval(pop.r, c(r_info$conf.int[1], r_info$conf.int[2]))
-
-
-
   return(data.out)
 }
 
