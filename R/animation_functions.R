@@ -65,7 +65,8 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
   LL_label_y = LL_max_density + text_offset
   UL_label_y = UL_max_density + text_offset
 
-  myymax <- dt(x = 0, df = df, ncp = 0) * 1.2
+  myymax <- dt(x = 0, df = df, ncp = 0)
+  #myymax <- LL_max_density*1.2
   myxmin <- stats::qt(ncp = LL_tlabel, df = df, p = .001)
   myxmax <- stats::qt(ncp = UL_tlabel, df = df, p = .999)
   myxmin <- convert_t_to_drep(myxmin, n = n)
@@ -119,7 +120,7 @@ plot_anim_ci_drep <- function(d = 1, n = 20, level = .95, center.level = NULL, g
       annotate(geom = "segment", x = d, xend = d, y = 0, yend = .3*myymax, linewidth = 1) +
       annotate(geom = "text", size = fontsize, x = d, y = .35*myymax, label = sprintf("sample\nd = %1.2f", d)) +
       coord_cartesian(xlim = c(myxmin, myxmax), ylim = c(0, myymax*1.2)) +
-      annotate(geom = "text", size = 10, x = d, y = myymax*1.1 , label = "We have found the Lower Limit of the confidence interval.") +
+      annotate(geom = "text", size = 10, x = d, y = myymax*1.1 , label = "We have found the Lower Limit of the confidence interval.", hjust = 0) +
     theme_classic(24)
 
     output = ci_base_LLfreeze
